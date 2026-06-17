@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lark Doc Transfer"
+  short_description: "Transfer Feishu/Lark documents into your space with validation."
+  default_prompt: "Use $lark-doc-transfer to transfer these Feishu/Lark document links into my personal space and report any degradation."
