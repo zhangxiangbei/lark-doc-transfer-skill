@@ -802,20 +802,23 @@ def load_urls(args: argparse.Namespace) -> list[str]:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Transfer Feishu/Lark wiki/docx links or wiki subtrees with validation."
+        description=(
+            "迁移飞书/Lark Wiki、Docx 链接或 Wiki 子树并验证质量。 / "
+            "Transfer Feishu/Lark Wiki, Docx links, or Wiki subtrees with validation."
+        )
     )
-    parser.add_argument("urls", nargs="*", help="Feishu/Lark wiki or docx URLs to transfer")
-    parser.add_argument("--input-file", help="UTF-8 text file with one URL per line")
-    parser.add_argument("--source-tree-url", help="root wiki node URL/token to transfer recursively")
-    parser.add_argument("--target-parent-url", help="target wiki parent node URL/token for tree transfer")
-    parser.add_argument("--target-position", default="my_library", help="docs +create parent position")
-    parser.add_argument("--target-space-id", help="wiki target space_id for native node-copy")
+    parser.add_argument("urls", nargs="*", help="要迁移的飞书/Lark Wiki 或 Docx URL / URLs to transfer")
+    parser.add_argument("--input-file", help="每行一个 URL 的 UTF-8 文件 / UTF-8 file with one URL per line")
+    parser.add_argument("--source-tree-url", help="递归迁移的 Wiki 根节点 URL/Token / Root Wiki node URL/token")
+    parser.add_argument("--target-parent-url", help="树迁移的目标 Wiki 父节点 / Target Wiki parent node")
+    parser.add_argument("--target-position", default="my_library", help="文档创建位置 / Document parent position")
+    parser.add_argument("--target-space-id", help="原生复制的目标 space_id / Target space_id for native copy")
     parser.add_argument("--as", dest="as_identity", default="user", choices=["user", "bot"])
-    parser.add_argument("--skip-native-copy", action="store_true", help="go straight to XML rebuild")
-    parser.add_argument("--dry-run", action="store_true", help="preview calls without creating documents")
-    parser.add_argument("--max-depth", type=int, default=0, help="tree depth limit; 0 means unlimited")
-    parser.add_argument("--report", help="write JSON report to this path")
-    parser.add_argument("--no-auth-check", action="store_true", help="skip auth/scope preflight")
+    parser.add_argument("--skip-native-copy", action="store_true", help="直接使用 XML 重建 / Go straight to XML rebuild")
+    parser.add_argument("--dry-run", action="store_true", help="仅预览，不创建文档 / Preview without creating documents")
+    parser.add_argument("--max-depth", type=int, default=0, help="树深度限制，0 为无限 / Tree depth limit; 0 is unlimited")
+    parser.add_argument("--report", help="JSON 报告输出路径 / JSON report output path")
+    parser.add_argument("--no-auth-check", action="store_true", help="跳过认证和权限预检 / Skip auth and scope preflight")
     return parser
 
 
@@ -824,11 +827,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     urls = load_urls(args)
     if args.source_tree_url and urls:
-        parser.error("use either --source-tree-url or positional/input-file URLs, not both")
+        parser.error("--source-tree-url 与位置参数/输入文件不能同时使用 / choose a tree URL or flat URLs, not both")
     if args.source_tree_url and not args.target_parent_url:
-        parser.error("--source-tree-url requires --target-parent-url")
+        parser.error("--source-tree-url 需要 --target-parent-url / --source-tree-url requires --target-parent-url")
     if not args.source_tree_url and not urls:
-        parser.error("provide at least one URL or --input-file")
+        parser.error("请至少提供一个 URL 或 --input-file / provide at least one URL or --input-file")
 
     report: dict[str, Any] = {
         "ok": False,
